@@ -204,10 +204,46 @@
             margin-right: 5px;
             font-size: 24px;
         }
+
+        .audio-control {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+
+        .audio-control button {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            color: white;
+            font-size: 18px;
+            backdrop-filter: blur(5px);
+            transition: all 0.3s ease;
+        }
+
+        .audio-control button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.1);
+        }
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
+    <audio autoplay loop id="bgMusic">
+        <source src="sound/amthanhphaohoa.m4a" type="audio/mp4">
+        Your browser does not support the audio element.
+    </audio>
+
+    <div class="audio-control">
+        <button id="toggleMusic">
+            <i class="fas fa-volume-up"></i>
+        </button>
+    </div>
+
     <div class="title">Quà tặng em 🎁</div>
     <div class="gift-container">
         <div class="ribbon"></div>
@@ -279,8 +315,8 @@
             // Bắn pháo hoa ngay lập tức
             autoFireworks();
             
-            // Tiếp tục bắn mỗi 2 giây
-            setInterval(autoFireworks, 2000);
+            // Tiếp tục bắn mỗi 0.2 giây
+            setInterval(autoFireworks, 20);
             
             // Bắn thêm nhiều pháo hoa cùng lúc khi bắt đầu
             for(let i = 0; i < 5; i++) {
@@ -300,6 +336,43 @@
             if(e.target.classList.contains('gift-container')) return;
             createFirework(e.clientX, window.innerHeight * 0.7);
         });
+
+        // Thêm code xử lý âm thanh
+        const music = document.getElementById('bgMusic');
+        const toggleButton = document.getElementById('toggleMusic');
+        const volumeIcon = toggleButton.querySelector('i');
+
+        toggleButton.addEventListener('click', () => {
+            if (music.paused) {
+                music.play();
+                volumeIcon.className = 'fas fa-volume-up';
+            } else {
+                music.pause();
+                volumeIcon.className = 'fas fa-volume-mute';
+            }
+        });
+
+        // Tự động phát nhạc khi load trang
+        window.addEventListener('load', function() {
+            let playPromise = music.play();
+            
+            if (playPromise !== undefined) {
+                playPromise.then(_ => {
+                    console.log("Audio started playing");
+                })
+                .catch(error => {
+                    console.log("Audio autoplay was prevented");
+                });
+            }
+        });
+
+        // Phát nhạc khi user tương tác với trang
+        document.addEventListener('click', function() {
+            if (music.paused) {
+                music.play();
+                volumeIcon.className = 'fas fa-volume-up';
+            }
+        }, { once: true });
     </script>
     <div class="tiktok-logo">
         <i class="fab fa-tiktok"></i>tiktok: tgrey.hoc.it

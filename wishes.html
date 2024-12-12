@@ -98,6 +98,8 @@
             box-sizing: border-box;
             margin-bottom: 10px;
             backdrop-filter: blur(5px);
+            transform-style: preserve-3d;
+            transition: transform 0.3s ease;
         }
 
         .note::before {
@@ -122,6 +124,10 @@
             color: #636e72;
             line-height: 1.6;
             font-size: 15px;
+        }
+
+        .note:hover {
+            transform: translateZ(20px) rotateX(5deg) rotateY(5deg);
         }
 
         @keyframes float {
@@ -214,11 +220,87 @@
             margin-right: 5px;
             font-size: 24px;
         }
+
+        .audio-control {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+
+        .audio-control button {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            color: white;
+            font-size: 18px;
+            backdrop-filter: blur(5px);
+            transition: all 0.3s ease;
+        }
+
+        .audio-control button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.1);
+        }
+
+        .social-share {
+            position: fixed;
+            left: 20px;
+            bottom: 20px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .social-share button {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            color: white;
+            font-size: 18px;
+            backdrop-filter: blur(5px);
+            transition: all 0.3s ease;
+        }
+
+        .social-share button:hover {
+            transform: scale(1.1);
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .flower {
+            position: fixed;
+            top: -20px;
+            font-size: 20px;
+            animation: falling linear forwards;
+            z-index: 1;
+        }
+
+        @keyframes falling {
+            to {
+                transform: translateY(100vh) rotate(360deg);
+            }
+        }
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
     <iframe src="heart.html" class="background-frame"></iframe>
+    
+    <audio autoplay loop id="bgMusic">
+        <source src="sound/soundbackground.m4a" type="audio/mp4">
+        Your browser does not support the audio element. 
+    </audio>
+
+    <div class="audio-control">
+        <button id="toggleMusic">
+            <i class="fas fa-volume-up"></i>
+        </button>
+    </div>
 
     <div class="container">
         <div class="profile-section">
@@ -235,7 +317,7 @@
 
             <div class="note" style="animation-delay: 10s;">
                 <h2>Ước mơ và hoài bão 🌟</h2>
-                    <p>Chúc em luôn mạnh mẽ và kiên định với ước mơ của mình. Hãy tiếp tục theo đuổi đam mê và đừng bao giờ từ bỏ những điều mình mong muốn.</p>
+                    <p>Chúc em luôn mạnh mẽ và kiên định với ước mơ ca mình. Hãy tiếp tục theo đuổi đam mê và đừng bao giờ từ bỏ những điều mình mong muốn.</p>
             </div>
 
             <div class="note" style="animation-delay: 12s;">
@@ -255,13 +337,20 @@
 
             <div class="note" style="animation-delay: 18s;">
                 <h2>Niềm vui và tiếng cười 😂</h2>
-                <p>Chúc em luôn giữ được nụ cười trên môi và tìm thấy niềm vui trong mọi khoảnh khắc của cuộc sống. Hãy sống thật hạnh phúc và trọn vẹn.</p>
+                <p>Chúc em luôn giữ được nụ cười trên mặt và tìm thấy niềm vui trong mọi khoảnh khắc của cuộc sống. Hãy sống thật hạnh phúc và trọn vẹn.</p>
             </div>
         </div>
     </div>
 
     <div class="tiktok-logo">
         <i class="fab fa-tiktok"></i>tiktok: tgrey.hoc.it
+    </div>
+
+    <div class="social-share">
+        <button onclick="window.open('https://www.facebook.com/thanhgrey1410')">
+            <i class="fab fa-facebook"></i>
+        </button>
+
     </div>
 
     <script>
@@ -286,6 +375,88 @@
         }
 
         setInterval(changeImage, 2000);
+
+        const music = document.getElementById('bgMusic');
+        const toggleButton = document.getElementById('toggleMusic');
+        const volumeIcon = toggleButton.querySelector('i');
+
+        toggleButton.addEventListener('click', () => {
+            if (music.paused) {
+                music.play();
+                volumeIcon.className = 'fas fa-volume-up';
+            } else {
+                music.pause();
+                volumeIcon.className = 'fas fa-volume-mute';
+            }
+        });
+
+        // Thêm code để tự động phát nhạc
+        window.addEventListener('load', function() {
+            const music = document.getElementById('bgMusic');
+            
+            // Thử phát nhạc
+            let playPromise = music.play();
+            
+            if (playPromise !== undefined) {
+                playPromise.then(_ => {
+                    // Phát nhạc thành công
+                    console.log("Audio started playing");
+                })
+                .catch(error => {
+                    // Tự động phát bị chặn
+                    console.log("Audio autoplay was prevented");
+                });
+            }
+        });
+
+        // Thêm xử lý khi user tương tác với trang
+        document.addEventListener('click', function() {
+            const music = document.getElementById('bgMusic');
+            if (music.paused) {
+                music.play();
+            }
+        }, { once: true });
+
+        function createFlower() {
+            const flower = document.createElement('div');
+            flower.className = 'flower';
+            flower.style.left = Math.random() * 100 + 'vw';
+            flower.style.animationDuration = Math.random() * 3 + 2 + 's';
+            flower.innerHTML = '🌸';
+            document.body.appendChild(flower);
+            
+            setTimeout(() => {
+                flower.remove();
+            }, 5000);
+        }
+
+        setInterval(createFlower, 300);
+
+        function typeWriter(element, text, speed = 50) {
+            let i = 0;
+            element.innerHTML = '';
+            function type() {
+                if (i < text.length) {
+                    element.innerHTML += text.charAt(i);
+                    i++;
+                    setTimeout(type, speed);
+                }
+            }
+            type();
+        }
+
+        // Áp dụng hiệu ứng gõ chữ cho các note
+        document.querySelectorAll('.note p').forEach(note => {
+            const text = note.innerHTML;
+            note.innerHTML = '';
+            
+            // Lấy animation-delay từ style của note parent
+            const delay = parseFloat(note.parentElement.style.animationDelay) * 1000;
+            
+            setTimeout(() => {
+                typeWriter(note, text);
+            }, delay + 500); // Thêm 500ms để đảm bảo note đã hiện ra
+        });
     </script>
 </body>
 </html> 
